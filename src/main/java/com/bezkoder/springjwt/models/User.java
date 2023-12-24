@@ -40,6 +40,20 @@ public class User {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private Wallet wallet;
+
+
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private Location location;
+
+  public Location getLocation() {
+    return location;
+  }
+
+  public void setLocation(Location location) {
+    this.location = location;
+  }
+
   public User() {
   }
 

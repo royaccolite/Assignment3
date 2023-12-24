@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.bezkoder.springjwt.dto.LocationDto;
 import com.bezkoder.springjwt.dto.WalletBalanceDto;
 import com.bezkoder.springjwt.security.services.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
-import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.bezkoder.springjwt.security.services.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -75,7 +76,7 @@ public class AuthController {
     return ResponseEntity.ok(new JwtResponse(jwt, 
                          userDetails.getId(), 
                          userDetails.getUsername(), 
-                         userDetails.getEmail(), 
+                         userDetails.getEmail(),
                          roles));
   }
 
@@ -176,7 +177,29 @@ public class AuthController {
     Long userId = userDetails.getId();
     walletService.withdrawFromWallet(userId, amount);
     return ResponseEntity.ok("Withdrawal successful");
+
   }
+
+
+  @Autowired
+  private UserService userService;
+  @GetMapping("/location")
+  public ResponseEntity<LocationDto> getUserLocation(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    Long userId = userDetails.getId();
+    LocationDto location = UserService.getUserLocation(userId);
+    return ResponseEntity.ok(location);
+  }
+
+  @PostMapping("/update-location")
+  public ResponseEntity<String> updateLocation(
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          @RequestBody LocationDto locationDto) {
+    Long userId = userDetails.getId();
+    UserService.updateUserLocation(userId, LocationDto.getLatitude(), LocationDto.getLongitude());
+    return ResponseEntity.ok("Location updated successfully");
+  }
+
+
 }
 // {
 //         "username": "amitabha",
