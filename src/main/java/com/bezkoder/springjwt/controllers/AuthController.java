@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.bezkoder.springjwt.dto.WalletBalanceDto;
+import com.bezkoder.springjwt.security.services.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -142,8 +145,44 @@ public class AuthController {
 
   @PostMapping("/logout")
   public String performLogout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-    // .. perform logout
     this.logoutHandler.logout(request, response, authentication);
     return "redirect:/home";
   }
+
+
+  @Autowired
+  private WalletService walletService;
+
+  @GetMapping("/balance")
+  public ResponseEntity<?> getWalletBalance(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    Long userId = userDetails.getId();
+    int balance = walletService.getWalletBalance(userId);
+
+
+    return ResponseEntity.ok(new WalletBalanceDto(balance));
+  }
+
+  @PostMapping("/deposit")
+  public ResponseEntity<String> depositToWallet(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                @RequestParam int amount) {
+    Long userId = userDetails.getId();
+    walletService.depositToWallet(userId, amount);
+    return ResponseEntity.ok("Deposit successful");
+  }
+
+  @PostMapping("/withdraw")
+  public ResponseEntity<String> withdrawFromWallet(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                   @RequestParam int amount) {
+    Long userId = userDetails.getId();
+    walletService.withdrawFromWallet(userId, amount);
+    return ResponseEntity.ok("Withdrawal successful");
+  }
 }
+// {
+//         "username": "amitabha",
+//         "email": "amit@mail.com",
+//         "role":[
+//         "ROLE_USER"
+//         ],
+//         "password": "amitabha"
+//         }
