@@ -35,7 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
-import com.roy.payment.security.services.*;
+import com.bezkoder.springjwt.security.services.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
